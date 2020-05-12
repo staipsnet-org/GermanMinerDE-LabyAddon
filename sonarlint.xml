@@ -1,0 +1,11 @@
+<application>
+  <component name="SonarLintGlobalSettings">
+    <option name="excludedRules">
+      <set>
+        <option value="java:S116" />
+        <option value="java:S1319" />
+        <option value="java:S5411" />
+      </set>
+    </option>
+  </component>
+</application>
