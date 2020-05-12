@@ -5,7 +5,9 @@
         <option value="java:S1148" />
         <option value="java:S116" />
         <option value="java:S120" />
+        <option value="java:S128" />
         <option value="java:S1319" />
+        <option value="java:S2696" />
         <option value="java:S5411" />
       </set>
     </option>
