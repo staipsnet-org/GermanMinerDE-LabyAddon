@@ -2,6 +2,7 @@
   <component name="FileTypeManager" version="17">
     <extensionMap>
       <mapping pattern="AbstractFraction" type="CLASS" />
+      <mapping ext="sk" type="PLAIN_TEXT" />
     </extensionMap>
   </component>
 </application>
