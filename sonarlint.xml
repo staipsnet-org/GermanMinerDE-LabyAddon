@@ -3,8 +3,10 @@
     <rules>
       <Rule active="false" key="java:S1148" />
       <Rule active="false" key="java:S120" />
+      <Rule active="false" key="java:S112" />
       <Rule active="false" key="java:S2142" />
       <Rule active="false" key="java:S107" />
+      <Rule active="false" key="java:S106" />
       <Rule active="false" key="java:S128" />
       <Rule active="false" key="java:S1319" />
       <Rule active="false" key="java:S5411" />
