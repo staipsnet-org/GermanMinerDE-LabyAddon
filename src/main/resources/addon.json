@@ -1,0 +1,10 @@
+{
+  "uuid": "cba3d840-7598-43a6-888a-d3a148d69675",
+  "name": "GermanMiner Addon",
+  "mainClass": "de.germanminer.labyaddon.GermanMinerAddon",
+  "description": "This is my first addon!",
+  "version": 1,
+  "author": "Duetro",
+  "category": 3,
+  "icon": "http://link-to-icon.net/icon64x64.png"
+}
