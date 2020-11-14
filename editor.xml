@@ -2,4 +2,7 @@
   <component name="DefaultFont">
     <option name="FONT_FAMILY" value="Consolas" />
   </component>
+  <component name="InlayHintsSettings">
+    <option name="lastViewedProviderKeyId" value="JavaLens" />
+  </component>
 </application>
