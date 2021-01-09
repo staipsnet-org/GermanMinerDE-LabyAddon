@@ -5,7 +5,7 @@
 
 # Prerequisites: appropriate project structure should exist in the repository.
 
-image: gradle:6.6.0
+image: gradle:2.14
 
 pipelines:
   default:
@@ -16,8 +16,6 @@ pipelines:
             - gradle
           script:
             - gradle build
-          after-script:
-            - pipe: atlassian/checkstyle-report:0.2.0
       - step:
           name: Security Scan
           script:
