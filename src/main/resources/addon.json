@@ -2,7 +2,7 @@
   "uuid": "%uuid%",
   "name": "GermanMinerDE",
   "mainClass": "de.germanminer.addon.GermanMinerAddon",
-  "description": "Official Addon for the RealLife-Server GermanMiner.DE!",
+  "description": "Offizielles Addon zur Verbesserung von Eingaben und Benachrichtigungen auf dem Real-Life-Server GermanMinerDE!",
   "version": 1,
   "author": "GermanMinerDE",
   "category": 3,
