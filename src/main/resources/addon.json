@@ -4,7 +4,7 @@
   "mainClass": "de.germanminer.addon.GermanMinerAddon",
   "description": "Offizielles Addon zur Verbesserung von Eingaben und Benachrichtigungen auf dem Real-Life-Server GermanMinerDE",
   "version": 1,
-  "author": "GermanMinerDE",
+  "author": "GermanMinerDE / Duetro",
   "category": 3,
   "icon": "http://img.germanminer.de/server-icon.png"
 }
