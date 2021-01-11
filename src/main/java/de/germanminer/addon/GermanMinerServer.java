@@ -12,7 +12,7 @@ import java.util.List;
 public class GermanMinerServer extends Server {
 
     public GermanMinerServer() {
-        super("germanminer_de", "localhost", "127.0.0.1");
+        super("germanminer_de", "mc.germanminer.de", "germanminer.de", "51.89.43.54:25565", "51.38.101.164:26511", "51.38.101.164:26512");
     }
 
     @Override
