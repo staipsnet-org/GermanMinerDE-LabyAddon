@@ -22,7 +22,7 @@ public class GermanMinerServer extends Server {
 
     @Override
     public ChatDisplayAction handleChatMessage(String s, String s1) throws Exception {
-        return null;
+        return ChatDisplayAction.NORMAL;
     }
 
     @Override
