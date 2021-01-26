@@ -9,7 +9,7 @@ import net.labymod.utils.ModColor;
 
 public class PlayerLevelModule extends SimpleTextModule {
 
-    private final String[] keys = new String[]{"Level", "Levelpunke"};
+    private final String[] keys = new String[]{"Level", "Levelpunkte"};
     private final String[] defaultValues = new String[]{"?", "?"};
 
     private int currentLevel = -1;
