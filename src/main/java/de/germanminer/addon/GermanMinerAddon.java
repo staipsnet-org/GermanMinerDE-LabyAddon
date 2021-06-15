@@ -99,4 +99,8 @@ public class GermanMinerAddon extends LabyModAddon {
     protected void fillSettings(List<SettingsElement> list) {
         // no settings
     }
+
+    public static int getAbilitiesVersion() {
+        return ABILITIES_VERSION;
+    }
 }

@@ -1,6 +1,8 @@
 package de.germanminer.addon;
 
+import com.google.gson.JsonObject;
 import net.labymod.api.events.TabListEvent;
+import net.labymod.main.LabyMod;
 import net.labymod.servermanager.ChatDisplayAction;
 import net.labymod.servermanager.Server;
 import net.labymod.settings.elements.SettingsElement;
@@ -18,6 +20,11 @@ public class GermanMinerServer extends Server {
     @Override
     public void onJoin(ServerData serverData) {
         GermanMinerAddon.setOnline(true);
+
+        // -- Version an den Server senden --
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("version", GermanMinerAddon.getAbilitiesVersion());
+        LabyMod.getInstance().getLabyModAPI().sendJsonMessageToServer("gmde-addon-info", jsonObject);
     }
 
     @Override
