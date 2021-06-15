@@ -4,12 +4,13 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import de.germanminer.addon.GermanMinerAddon;
-import net.labymod.core.ForgeAdapter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.entity.EntityTracker;
 
 public final class VehiclePosition {
+
+    public static final String ENTITIES_ARRAY_NAME = "entities";
 
     private VehiclePosition() {
     }
@@ -18,11 +19,11 @@ public final class VehiclePosition {
 
         GermanMinerAddon.getInstance().registerMessageConsumer("gmde-vehicle-position", jsonObject -> {
             // Validierung der Daten
-            if (!jsonObject.has("entities") || !jsonObject.get("entities").isJsonArray())
+            if (!jsonObject.has(ENTITIES_ARRAY_NAME) || !jsonObject.get(ENTITIES_ARRAY_NAME).isJsonArray())
                 return;
 
-            JsonArray entities = jsonObject.getAsJsonArray("entities");
-            for (JsonElement entityData : entities) {
+            JsonArray entitiesData = jsonObject.getAsJsonArray(ENTITIES_ARRAY_NAME);
+            for (JsonElement entityData : entitiesData) {
                 if (entityData instanceof JsonObject) {
                     int entityId = ((JsonObject) entityData).get("entityId").getAsInt();
                     Entity entity = Minecraft.getMinecraft().world.getEntityByID(entityId);
@@ -32,11 +33,9 @@ public final class VehiclePosition {
                         double z = ((JsonObject) entityData).get("z").getAsDouble();
                         float yaw = ((JsonObject) entityData).get("yaw").getAsFloat();
                         float pitch = ((JsonObject) entityData).get("pitch").getAsFloat();
-                        Minecraft.getMinecraft().ingameGUI.getChatGUI().printChatMessage(new TextComponentString("  -> Found Entity " + entityId));
-                        entity.setPositionAndRotation(x, y, z, yaw, pitch + 20f); // ToDo Den Test-Pitch seh ich nicht :(
+                        EntityTracker.updateServerPosition(entity, x,y, z);
+                        entity.setPositionAndRotationDirect(x, y, z, yaw, pitch, 3, false);
                     }
-
-
                 }
             }
         });

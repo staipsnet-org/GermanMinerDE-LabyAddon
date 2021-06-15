@@ -1,5 +1,5 @@
 {
-  "uuid": "%uuid%",
+  "uuid": "601ff6ce-1b2c-49ed-ba9a-c09ae49b95ac",
   "name": "GermanMinerDE",
   "mainClass": "de.germanminer.addon.GermanMinerAddon",
   "description": "Offizielles Addon zur Verbesserung von Eingaben und Benachrichtigungen auf dem Real-Life-Server GermanMinerDE",

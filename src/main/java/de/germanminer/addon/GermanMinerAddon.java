@@ -25,6 +25,8 @@ public class GermanMinerAddon extends LabyModAddon {
     private static GermanMinerAddon instance;
     private static boolean online = false;
 
+    private static int ABILITIES_VERSION = 1; // ToDo Version immer anpassen
+
     private final HashMap<String, Consumer<JsonObject>> serverMessageConsumers = new HashMap<>();
 
     public static ModuleCategory getModuleCategory() {
