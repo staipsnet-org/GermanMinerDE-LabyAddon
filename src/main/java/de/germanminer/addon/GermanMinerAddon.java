@@ -3,6 +3,7 @@ package de.germanminer.addon;
 import com.google.gson.JsonObject;
 import de.germanminer.addon.features.GuiTextboxPrompt;
 import de.germanminer.addon.features.NotificationManager;
+import de.germanminer.addon.features.VehiclePosition;
 import de.germanminer.addon.modules.BankSystemModule;
 import de.germanminer.addon.modules.PlayerLevelModule;
 import net.labymod.api.EventManager;
@@ -82,6 +83,7 @@ public class GermanMinerAddon extends LabyModAddon {
         System.out.println("[GermanMinerDE] Registering Features...");
         GuiTextboxPrompt.initialize();
         NotificationManager.initialize();
+        VehiclePosition.initialize();
 
         System.out.println("[GermanMinerDE] Finished initialization.");
     }
