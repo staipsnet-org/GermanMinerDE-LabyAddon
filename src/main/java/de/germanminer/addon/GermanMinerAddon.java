@@ -6,6 +6,7 @@ import de.germanminer.addon.features.NotificationManager;
 import de.germanminer.addon.features.VehiclePosition;
 import de.germanminer.addon.modules.BankSystemModule;
 import de.germanminer.addon.modules.PlayerLevelModule;
+import de.germanminer.addon.modules.VehicleDisplayModule;
 import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
 import net.labymod.api.events.ServerMessageEvent;
@@ -81,6 +82,7 @@ public class GermanMinerAddon extends LabyModAddon {
         System.out.println("[GermanMinerDE] Registering Modules...");
         getApi().registerModule(new BankSystemModule(this));
         getApi().registerModule(new PlayerLevelModule(this));
+        getApi().registerModule(new VehicleDisplayModule(this));
 
         System.out.println("[GermanMinerDE] Registering Features...");
         GuiTextboxPrompt.initialize();
