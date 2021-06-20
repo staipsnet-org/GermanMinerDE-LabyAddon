@@ -1,13 +1,20 @@
 package de.germanminer.addon.modules;
 
 import de.germanminer.addon.GermanMinerAddon;
+import net.labymod.addon.AddonLoader;
+import net.labymod.addons.labysminimap.LabysMinimap;
+import net.labymod.addons.labysminimap.map.MinimapModule;
+import net.labymod.api.LabyModAPI;
+import net.labymod.api.LabyModAddon;
 import net.labymod.ingamegui.Module;
 import net.labymod.ingamegui.ModuleCategory;
 import net.labymod.settings.elements.ControlElement;
 import net.labymod.utils.DrawUtils;
 import net.labymod.utils.Material;
+import org.apache.logging.log4j.core.util.UuidUtil;
 
 import java.awt.*;
+import java.util.UUID;
 
 public class VehicleDisplayModule extends Module {
 
@@ -141,6 +148,11 @@ public class VehicleDisplayModule extends Module {
     }
 
     @Override
+    public String getControlName() {
+        return "Fahrzeug-Anzeigen";
+    }
+
+    @Override
     public String getDescription() {
         return "Zeigt Informationen zu Vehicles an und ermöglicht das Belegen von Hotkeys (z.B. Motor starten, Hupe, ...).";
     }
@@ -148,5 +160,25 @@ public class VehicleDisplayModule extends Module {
     @Override
     public int getSortingId() {
         return 0;
+    }
+
+    public double getX() {
+        return x;
+    }
+
+    public double getY() {
+        return y;
+    }
+
+    public double getRightX() {
+        return rightX;
+    }
+
+    public double getCenterX() {
+        return centerX;
+    }
+
+    public double getCenterY() {
+        return centerY;
     }
 }
