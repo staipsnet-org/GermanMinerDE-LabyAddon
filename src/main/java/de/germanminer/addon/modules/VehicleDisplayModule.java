@@ -1,20 +1,13 @@
 package de.germanminer.addon.modules;
 
 import de.germanminer.addon.GermanMinerAddon;
-import net.labymod.addon.AddonLoader;
-import net.labymod.addons.labysminimap.LabysMinimap;
-import net.labymod.addons.labysminimap.map.MinimapModule;
-import net.labymod.api.LabyModAPI;
-import net.labymod.api.LabyModAddon;
 import net.labymod.ingamegui.Module;
 import net.labymod.ingamegui.ModuleCategory;
 import net.labymod.settings.elements.ControlElement;
 import net.labymod.utils.DrawUtils;
 import net.labymod.utils.Material;
-import org.apache.logging.log4j.core.util.UuidUtil;
 
 import java.awt.*;
-import java.util.UUID;
 
 public class VehicleDisplayModule extends Module {
 
@@ -83,7 +76,7 @@ public class VehicleDisplayModule extends Module {
     }
 
     private void drawSpeedometer() {
-        drawUtils.bindTexture("germanminer/textures/speedometer.png");
+        drawUtils.bindTexture("germanminer/textures/speedometer_empty_middle.png");
         drawUtils.drawTexture(x, y, 256, 256, 128, 128);
 
         double speedAngle = (speed * ANGLE_PER_KMH) + SPEED_ZERO_ANGLE;
@@ -91,7 +84,7 @@ public class VehicleDisplayModule extends Module {
         double cos = Math.cos(speedAngle) * -1;
         double centerX = x + 64;
         double centerY = y + 64;
-        for (float r = 38; r < 62; r += 0.5) {
+        for (float r = 39; r < 62; r += 0.5) {
             int pointX = (int) Math.round((centerX + sin * r));
             int pointY = (int) Math.round((centerY + cos * r));
             drawUtils.drawRect(pointX, pointY, pointX + 1, pointY + 1, Color.ORANGE.getRGB());
