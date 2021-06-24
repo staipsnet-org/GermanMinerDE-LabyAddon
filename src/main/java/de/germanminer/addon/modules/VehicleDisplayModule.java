@@ -1,24 +1,41 @@
 package de.germanminer.addon.modules;
 
+import com.google.gson.JsonObject;
 import de.germanminer.addon.GermanMinerAddon;
 import net.labymod.ingamegui.Module;
 import net.labymod.ingamegui.ModuleCategory;
+import net.labymod.ingamegui.enums.EnumDisplayType;
 import net.labymod.settings.elements.ControlElement;
 import net.labymod.utils.DrawUtils;
 import net.labymod.utils.Material;
+import org.lwjgl.opengl.GL11;
 
+import javax.annotation.Nullable;
 import java.awt.*;
+import java.util.Set;
 
 public class VehicleDisplayModule extends Module {
 
+    // ToDo An den Server senden, wenn das Modul aktiviert ist!!! Sonst normale Actionbar nutzen
+
+    public static final String MESSAGE_KEY = "gmde-vehicle-display";
     private static final String JSON_KEY_SHOW = "show";
     private static final String JSON_KEY_SPEED = "speed";
+    private static final String JSON_KEY_LIMITER_ACTIVE = "limiterActive";
     private static final String JSON_KEY_LIMITER_SPEED = "limiterSpeed";
     private static final String JSON_KEY_FUEL = "fuelPercent";
     private static final String JSON_KEY_GEAR_POSITION = "gearPosition";
     private static final String JSON_KEY_ENGINE_STATE = "engineState";
     private static final String JSON_KEY_NIGHT_MODE = "nightMode";
-    private static final String JSON_KEY_ENGINE_FAILURE = "engineFailure";
+    private static final String JSON_KEY_DAMAGE_STATE = "damageState";
+
+    private static final String TEXTURE_BASE_PATH = "germanminer/textures/vehicle-display/";
+    private static final Color SPEEDOMETER_LINE_COLOR = new Color(228,201, 74);
+    private static final Color SPEEDOMETER_LINE_COLOR_NIGHT = new Color(250,210, 23);
+
+    private static final Color SPEED_LIMITER_LINE_COLOR_ACTIVE = new Color(194,75, 75);
+    private static final Color SPEED_LIMITER_LINE_COLOR_ACTIVE_NIGHT = new Color(212,30, 30);
+    private static final Color SPEED_LIMITER_LINE_COLOR_INACTIVE = Color.LIGHT_GRAY;
 
     private static final double SPEED_ZERO_ANGLE = Math.toRadians(-112.5f); // Winkel in Grad bei 0 km/h (wird in Radians umgerechnet)
     private static final float TOTAL_ANGLE = 225; // Spannweite des Winkels in Grad bei höchster Speed, die man anzeigen kann
@@ -32,32 +49,35 @@ public class VehicleDisplayModule extends Module {
     private final DrawUtils drawUtils;
     private double x;
     private double y;
-    private double rightX;
     private double centerX;
     private double centerY;
 
     private boolean show = false;
     private int speed = -1;
+    private boolean limiterActive = false;
     private int limiterSpeed = -1;
     private int fuelPercent = -1;
     private String gearPosition = null;
     private String engineState = null;
     private boolean nightMode = false;
-    private boolean engineFailure = false;
+    private int damageState = -1;
+
+    private int engineFailureLight; // wird hin- und hergesetzt, damit die Lampe blinkt
 
     public VehicleDisplayModule(GermanMinerAddon addon) {
         this.addon = addon;
         this.drawUtils = addon.getApi().getDrawUtils();
-        addon.registerMessageConsumer("gmde-vehicle-display", jsonObject -> {
+        addon.registerMessageConsumer(MESSAGE_KEY, jsonObject -> {
             show = jsonObject.has(JSON_KEY_SHOW) && jsonObject.get(JSON_KEY_SHOW).isJsonPrimitive() && jsonObject.get(JSON_KEY_SHOW).getAsBoolean();
             if (!show)
                 return;
             speed = (jsonObject.has(JSON_KEY_SPEED) && jsonObject.get(JSON_KEY_SPEED).isJsonPrimitive()) ? Math.min(jsonObject.get(JSON_KEY_SPEED).getAsInt(), MAX_SPEED) : -1;
+            limiterActive = jsonObject.has(JSON_KEY_LIMITER_ACTIVE) && jsonObject.get(JSON_KEY_LIMITER_ACTIVE).isJsonPrimitive() && jsonObject.get(JSON_KEY_LIMITER_ACTIVE).getAsBoolean();
             limiterSpeed = (jsonObject.has(JSON_KEY_LIMITER_SPEED) && jsonObject.get(JSON_KEY_LIMITER_SPEED).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_LIMITER_SPEED).getAsInt() : -1;
             fuelPercent = (jsonObject.has(JSON_KEY_FUEL) && jsonObject.get(JSON_KEY_FUEL).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_FUEL).getAsInt() : -1;
             gearPosition = (jsonObject.has(JSON_KEY_GEAR_POSITION) && jsonObject.get(JSON_KEY_GEAR_POSITION).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_GEAR_POSITION).getAsString() : null;
             engineState = (jsonObject.has(JSON_KEY_ENGINE_STATE) && jsonObject.get(JSON_KEY_ENGINE_STATE).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_ENGINE_STATE).getAsString() : null;
-            engineFailure = jsonObject.has(JSON_KEY_ENGINE_FAILURE) && jsonObject.get(JSON_KEY_ENGINE_FAILURE).isJsonPrimitive() && jsonObject.get(JSON_KEY_ENGINE_FAILURE).getAsBoolean();
+            damageState = (jsonObject.has(JSON_KEY_DAMAGE_STATE) && jsonObject.get(JSON_KEY_DAMAGE_STATE).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_DAMAGE_STATE).getAsInt() : -1;
             nightMode = jsonObject.has(JSON_KEY_NIGHT_MODE) && jsonObject.get(JSON_KEY_NIGHT_MODE).isJsonPrimitive() && jsonObject.get(JSON_KEY_NIGHT_MODE).getAsBoolean();
         });
     }
@@ -66,30 +86,37 @@ public class VehicleDisplayModule extends Module {
     public void draw(double x, double y, double rightX) {
         this.x = x;
         this.y = y;
-        this.rightX = rightX;
         this.centerX = x + 64;
         this.centerY = y + 64;
 
         drawSpeedometer();
+        drawSpeedLimiterInfo();
         drawEngineAndGearInfo();
+        drawWarningLight();
 
     }
 
-    private void drawSpeedometer() {
-        drawUtils.bindTexture("germanminer/textures/speedometer_empty_middle.png");
-        drawUtils.drawTexture(x, y, 256, 256, 128, 128);
-
+    private void drawSpeedLine(int speed, Color color) {
         double speedAngle = (speed * ANGLE_PER_KMH) + SPEED_ZERO_ANGLE;
         double sin = Math.sin(speedAngle);
         double cos = Math.cos(speedAngle) * -1;
-        double centerX = x + 64;
-        double centerY = y + 64;
         for (float r = 39; r < 62; r += 0.5) {
             int pointX = (int) Math.round((centerX + sin * r));
             int pointY = (int) Math.round((centerY + cos * r));
-            drawUtils.drawRect(pointX, pointY, pointX + 1, pointY + 1, Color.ORANGE.getRGB());
+            drawUtils.drawRect(pointX, pointY, pointX + 1, pointY + 1, color.getRGB());
         }
-        drawUtils.drawCenteredString(String.valueOf(speed), centerX, centerY - 8, 2);
+    }
+
+    private void drawSpeedometer() {
+        // Hintergrund des Tachos
+        drawUtils.bindTexture(Texture.SPEEDOMETER_BACKGROUND_BLACK.getResourcePath(nightMode));
+        drawUtils.drawTexture(x, y, 256, 256, 128, 128);
+
+        // Linie der Geschwindigkeit
+        drawSpeedLine(speed, (nightMode ? SPEEDOMETER_LINE_COLOR_NIGHT : SPEEDOMETER_LINE_COLOR));
+
+        // Digitale km/h-Anzeige
+        drawUtils.drawCenteredString(String.valueOf(speed), centerX, centerY - 12, 2);
     }
 
     private void drawEngineAndGearInfo() {
@@ -102,7 +129,36 @@ public class VehicleDisplayModule extends Module {
             info = "Gang: " + gearPosition.charAt(0);
 
         if (info != null)
-            drawUtils.drawCenteredString(info, centerX, centerY - 16, 0.5d);
+            drawUtils.drawCenteredString(info, centerX, centerY - 20, 0.5d);
+    }
+
+    private void drawSpeedLimiterInfo() {
+        if (limiterSpeed < 30)
+            return;
+
+        Texture limiterTexture = limiterActive ? Texture.SPEED_LIMITER_ACTIVE : Texture.SPEED_LIMITER_READY;
+
+        drawUtils.bindTexture(limiterTexture.getResourcePath(nightMode));
+        drawUtils.drawTexture(x + 33, y + 100, 256, 256, 12, 12);
+
+        drawSpeedLine(limiterSpeed, limiterActive ? (nightMode ? SPEED_LIMITER_LINE_COLOR_ACTIVE_NIGHT : SPEED_LIMITER_LINE_COLOR_ACTIVE) : SPEED_LIMITER_LINE_COLOR_INACTIVE);
+    }
+
+    private void drawWarningLight() {
+        damageState = 2; // ToDO REMOVE AFTER TESTING
+
+        if (damageState < 1)
+            return;
+
+        Texture warningLightTexture = damageState == 1 ? Texture.WARNING_YELLOW : Texture.WARNING_RED;
+
+        // Symbol soll blinken, wenn es aktiv ist (2-Sekunden-Takt)
+        if (engineFailureLight++ < 40) {
+            drawUtils.bindTexture(warningLightTexture.getResourcePath(nightMode));
+            drawUtils.drawTexture(x + 57, y + 106, 256, 256, 14, 14);
+        }
+        if (engineFailureLight == 80)
+            engineFailureLight = 0;
     }
 
     @Override
@@ -110,9 +166,36 @@ public class VehicleDisplayModule extends Module {
         return new ControlElement.IconData(Material.COMPASS);
     }
 
+    /**
+     * Wird beim Laden des Addons / Joinen ausgeführt
+     */
+    @Override
+    public void setEnabled(Set<EnumDisplayType> enabled) {
+        super.setEnabled(enabled);
+        sendModuleInfo();
+    }
+
+    /**
+     * Wird ausgeführt, wenn man ein Modul an- / ausschaltet
+     */
+    @Override
+    public void settingUpdated(boolean enabled) {
+        super.settingUpdated(enabled);
+        sendModuleInfo();
+    }
+
+    /**
+     * Info an den Server schicken, ob das Modul aktiviert ist
+     */
+    public void sendModuleInfo() {
+        JsonObject moduleInfo = new JsonObject();
+        moduleInfo.addProperty("moduleEnabled", isEnabled(EnumDisplayType.INGAME));
+        addon.getApi().sendJsonMessageToServer(MESSAGE_KEY, moduleInfo);
+    }
+
     @Override
     public boolean isShown() {
-        return show && addon.getApi().isIngame() && addon.getApi().hasGameFocus(); // ToDo After testing die show-Variable einbauen & nur auf GM anzeigen!
+        return GermanMinerAddon.isOnline() && show && addon.getApi().isIngame(); // ToDo Einstellung, ob es angezeigt wird, wenn man Chat offen hat -> hasGameFocus()
     }
 
     @Override

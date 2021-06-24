@@ -7,10 +7,6 @@ import de.germanminer.addon.features.VehiclePosition;
 import de.germanminer.addon.modules.BankSystemModule;
 import de.germanminer.addon.modules.PlayerLevelModule;
 import de.germanminer.addon.modules.VehicleDisplayModule;
-import de.germanminer.addon.modules.VehicleMapModule;
-import de.germanminer.addon.utils.VehicleMapUpdateHandler;
-import net.labymod.addon.AddonLoader;
-import net.labymod.addons.labysminimap.LabysMinimap;
 import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
 import net.labymod.api.events.ServerMessageEvent;
@@ -28,8 +24,6 @@ public class GermanMinerAddon extends LabyModAddon {
     private static GermanMinerServer server;
     private static GermanMinerAddon instance;
     private static boolean online = false;
-
-    private VehicleMapModule vehicleMapModule;
 
     private static final int ABILITIES_VERSION = 1; // ToDo Version immer anpassen
 
@@ -87,25 +81,7 @@ public class GermanMinerAddon extends LabyModAddon {
         System.out.println("[GermanMinerDE] Registering Modules...");
         getApi().registerModule(new BankSystemModule(this));
         getApi().registerModule(new PlayerLevelModule(this));
-        VehicleDisplayModule vehicleDisplayModule = new VehicleDisplayModule(this);
-        getApi().registerModule(vehicleDisplayModule);
-
-        // Laby' Minimap muss erst geladen sein, daher Delay
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                // Wenn Laby's Minimap installiert ist, kann diese als Fahrzeug-Navi-Karte verwendet werden
-                LabyModAddon minimapAddon = AddonLoader.getAddonByUUID(UUID.fromString("6289a31b-8914-4142-a77d-b087661e7f0a"));
-                if (minimapAddon != null && minimapAddon instanceof LabysMinimap) {
-                    System.out.println("[GermanMinerDE] LabysMinimap is installed, registering VehicleMapModule...");
-                    VehicleMapUpdateHandler mapUpdateHandler = new VehicleMapUpdateHandler((LabysMinimap) minimapAddon);
-                    vehicleMapModule = new VehicleMapModule(vehicleDisplayModule, (LabysMinimap) minimapAddon, mapUpdateHandler);
-                    getApi().registerForgeListener(mapUpdateHandler);
-                    getApi().registerModule(vehicleMapModule);
-                }
-            }
-        }, 1000);
-
+        getApi().registerModule(new VehicleDisplayModule(this));
 
         System.out.println("[GermanMinerDE] Registering Features...");
         GuiTextboxPrompt.initialize();
@@ -128,7 +104,4 @@ public class GermanMinerAddon extends LabyModAddon {
         return ABILITIES_VERSION;
     }
 
-    public VehicleMapModule getVehicleMapModule() {
-        return vehicleMapModule;
-    }
 }
