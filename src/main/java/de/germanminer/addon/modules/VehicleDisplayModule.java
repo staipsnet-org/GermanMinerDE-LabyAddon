@@ -238,23 +238,25 @@ public class VehicleDisplayModule extends Module {
         return 0;
     }
 
-    public double getX() {
-        return x;
+    private enum Texture {
+        SPEEDOMETER_BACKGROUND_BLACK("speedometer-background-black.png", "speedometer-background-black-night.png"),
+        WARNING_YELLOW("warning-yellow.png", null),
+        WARNING_RED("warning-red.png", null),
+        SPEED_LIMITER_ACTIVE("speed-limiter-green.png", null),
+        SPEED_LIMITER_READY("speed-limiter-yellow.png", null),
+        FUEL("fuel.png", null);
+
+        private final String fileName;
+        private final String nightFileName;
+
+        Texture(String fileName, @Nullable String nightFileName) {
+            this.fileName = fileName;
+            this.nightFileName = nightFileName;
+        }
+
+        protected String getResourcePath(boolean night) {
+            return TEXTURE_BASE_PATH + (night && nightFileName != null ? nightFileName : fileName);
+        }
     }
 
-    public double getY() {
-        return y;
-    }
-
-    public double getRightX() {
-        return rightX;
-    }
-
-    public double getCenterX() {
-        return centerX;
-    }
-
-    public double getCenterY() {
-        return centerY;
-    }
 }
