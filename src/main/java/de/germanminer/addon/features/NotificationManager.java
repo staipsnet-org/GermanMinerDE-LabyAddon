@@ -29,7 +29,7 @@ public final class NotificationManager {
         });
     }
 
-    private static void sendNotification(String title, String description, @Nullable String uuid, @Nullable String imageURL) {
+    public static void sendNotification(String title, String description, @Nullable String uuid, @Nullable String imageURL) {
         int hashCode = Objects.hash(title, description, uuid);
 
         if (!notificationDelay.containsKey(hashCode) || notificationDelay.get(hashCode) < System.currentTimeMillis()) {
