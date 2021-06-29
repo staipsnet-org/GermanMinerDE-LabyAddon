@@ -170,7 +170,7 @@ public class GermanMinerAddon extends LabyModAddon {
                 .setRange(0, 100)
                 .setSteps(5)
                 .addCallback(value -> {
-                    float finalValue = value != 0 ? (value * 10f / 100) : 1f;
+                    float finalValue = value != 0 ? (value * 15f / 100) : 1f;
 
                     VoiceClient.setOutputVolume(finalValue);
 
@@ -196,7 +196,7 @@ public class GermanMinerAddon extends LabyModAddon {
                 .setRange(0, 100)
                 .setSteps(5)
                 .addCallback(value -> {
-                    float finalValue = value != 0 ? (value * 4f / 100) : 1f;
+                    float finalValue = value != 0 ? (value * 6f / 100) : 1f;
 
                     VoiceClient.setOutputVolume(finalValue);
 
