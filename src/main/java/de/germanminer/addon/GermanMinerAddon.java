@@ -9,6 +9,7 @@ import de.germanminer.addon.features.voice.VoiceSocket;
 import de.germanminer.addon.features.voice.VoiceUtils;
 import de.germanminer.addon.modules.BankSystemModule;
 import de.germanminer.addon.modules.PlayerLevelModule;
+import de.germanminer.addon.modules.VoiceModule;
 import net.labymod.api.EventManager;
 import net.labymod.api.LabyModAddon;
 import net.labymod.api.events.ServerMessageEvent;
@@ -18,7 +19,10 @@ import net.labymod.ingamegui.ModuleCategoryRegistry;
 import net.labymod.settings.elements.*;
 import net.labymod.utils.Material;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class GermanMinerAddon extends LabyModAddon {
@@ -49,7 +53,10 @@ public class GermanMinerAddon extends LabyModAddon {
     public static void setOnline(boolean online) {
         GermanMinerAddon.online = online;
 
-        VoiceSocket.disconnect();
+        if (!online) {
+            VoiceClient.setPlayerKey(null);
+            VoiceSocket.disconnect();
+        }
     }
 
     public void registerMessageConsumer(String messageKey, Consumer<JsonObject> consumer) {
@@ -82,6 +89,7 @@ public class GermanMinerAddon extends LabyModAddon {
         System.out.println("[GermanMinerDE] Registering Modules...");
         getApi().registerModule(new BankSystemModule(this));
         getApi().registerModule(new PlayerLevelModule(this));
+        getApi().registerModule(new VoiceModule());
 
         System.out.println("[GermanMinerDE] Registering Features...");
         GuiTextboxPrompt.initialize();
@@ -98,6 +106,8 @@ public class GermanMinerAddon extends LabyModAddon {
     public void loadConfig() {
         if (getConfig().has("voiceEnabled"))
             VoiceClient.setEnabled(getConfig().get("voiceEnabled").getAsBoolean());
+        if (getConfig().has("radioSoundsEnabled"))
+            VoiceClient.setRadioSoundsEnabled(getConfig().get("radioSoundsEnabled").getAsBoolean());
         if (getConfig().has("inputVolume"))
             VoiceClient.setInputVolume(getConfig().get("inputVolume").getAsFloat());
         if (getConfig().has("outputVolume"))
@@ -173,6 +183,15 @@ public class GermanMinerAddon extends LabyModAddon {
 
         // ** Ausgabe-Einstellungen **
         list.add(new HeaderElement("§cAusgabe-Einstellungen"));
+        list.add(new BooleanElement("Funk-Sounds", new ControlElement.IconData(Material.NOTE_BLOCK), enabled -> {
+            VoiceClient.setRadioSoundsEnabled(enabled);
+
+            if (!enabled)
+                getConfig().addProperty("radioSoundsEnabled", false);
+            else
+                getConfig().remove("radioSoundsEnabled");
+            saveConfig();
+        }, VoiceClient.areRadioSoundsEnabled()));
         list.add(new SliderElement("Verstärkung", new ControlElement.IconData(Material.NOTE_BLOCK), VoiceClient.getInputVolume() == 1 ? 0 : (int) (VoiceClient.getInputVolume() * 100 / 4f))
                 .setRange(0, 100)
                 .setSteps(5)
