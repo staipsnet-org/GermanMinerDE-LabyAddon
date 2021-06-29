@@ -8,7 +8,6 @@ import net.labymod.ingamegui.enums.EnumDisplayType;
 import net.labymod.settings.elements.ControlElement;
 import net.labymod.utils.DrawUtils;
 import net.labymod.utils.Material;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import java.awt.*;
@@ -20,6 +19,7 @@ public class VehicleDisplayModule extends Module {
 
     public static final String MESSAGE_KEY = "gmde-vehicle-display";
     private static final String JSON_KEY_SHOW = "show";
+    private static final String JSON_KEY_IS_DRIVER = "isDriver";
     private static final String JSON_KEY_SPEED = "speed";
     private static final String JSON_KEY_LIMITER_ACTIVE = "limiterActive";
     private static final String JSON_KEY_LIMITER_SPEED = "limiterSpeed";
@@ -42,8 +42,8 @@ public class VehicleDisplayModule extends Module {
     private static final int MAX_SPEED = 200; // Höchstgeschwindigkeit, die der Tacho anzeigen kann
     private static final double ANGLE_PER_KMH = Math.toRadians(TOTAL_ANGLE / MAX_SPEED);
 
-    // ToDo Einstellungsmenü für Addon: Hotkeys (Hupe, Tempomat, Motor an/aus, ...); Farbe des Tempozeigers; ...?
-    // TODo Schön ausführlich kommentieren
+    // ToDo Einstellungsmenü für Addon: Hotkeys (Sirene, Tempomat, Motor an/aus, ...); Farbe des Tempozeigers; ...?
+    // ToDo Schön ausführlich kommentieren
 
     private final GermanMinerAddon addon;
     private final DrawUtils drawUtils;
@@ -53,6 +53,7 @@ public class VehicleDisplayModule extends Module {
     private double centerY;
 
     private boolean show = false;
+    private boolean isDriver = false;
     private int speed = -1;
     private boolean limiterActive = false;
     private int limiterSpeed = -1;
@@ -71,6 +72,7 @@ public class VehicleDisplayModule extends Module {
             show = jsonObject.has(JSON_KEY_SHOW) && jsonObject.get(JSON_KEY_SHOW).isJsonPrimitive() && jsonObject.get(JSON_KEY_SHOW).getAsBoolean();
             if (!show)
                 return;
+            isDriver = jsonObject.has(JSON_KEY_IS_DRIVER) && jsonObject.get(JSON_KEY_IS_DRIVER).isJsonPrimitive() && jsonObject.get(JSON_KEY_IS_DRIVER).getAsBoolean();
             speed = (jsonObject.has(JSON_KEY_SPEED) && jsonObject.get(JSON_KEY_SPEED).isJsonPrimitive()) ? Math.min(jsonObject.get(JSON_KEY_SPEED).getAsInt(), MAX_SPEED) : -1;
             limiterActive = jsonObject.has(JSON_KEY_LIMITER_ACTIVE) && jsonObject.get(JSON_KEY_LIMITER_ACTIVE).isJsonPrimitive() && jsonObject.get(JSON_KEY_LIMITER_ACTIVE).getAsBoolean();
             limiterSpeed = (jsonObject.has(JSON_KEY_LIMITER_SPEED) && jsonObject.get(JSON_KEY_LIMITER_SPEED).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_LIMITER_SPEED).getAsInt() : -1;
@@ -145,8 +147,6 @@ public class VehicleDisplayModule extends Module {
     }
 
     private void drawWarningLight() {
-        damageState = 2; // ToDO REMOVE AFTER TESTING
-
         if (damageState < 1)
             return;
 
