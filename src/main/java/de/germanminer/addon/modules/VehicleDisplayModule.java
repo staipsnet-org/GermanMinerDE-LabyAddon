@@ -15,7 +15,7 @@ import java.util.Set;
 
 public class VehicleDisplayModule extends Module {
 
-    // ToDo An den Server senden, wenn das Modul aktiviert ist!!! Sonst normale Actionbar nutzen
+    // ToDo An den Server senden, wenn das Modul aktiviert ist!!! Sonst normale Actionbar nutzen -> ISt gemacht, machmal bekommt man aber ActionBar trotz aktiviertem Tacho-Module (Tacho wird dann nicht showed)
 
     public static final String MESSAGE_KEY = "gmde-vehicle-display";
     private static final String JSON_KEY_SHOW = "show";
@@ -30,19 +30,23 @@ public class VehicleDisplayModule extends Module {
     private static final String JSON_KEY_DAMAGE_STATE = "damageState";
 
     private static final String TEXTURE_BASE_PATH = "germanminer/textures/vehicle-display/";
-    private static final Color SPEEDOMETER_LINE_COLOR = new Color(228,201, 74);
-    private static final Color SPEEDOMETER_LINE_COLOR_NIGHT = new Color(250,210, 23);
+    private static final Color SPEEDOMETER_LINE_COLOR = new Color(228, 201, 74);
+    private static final Color SPEEDOMETER_LINE_COLOR_NIGHT = new Color(250, 210, 23);
 
-    private static final Color SPEED_LIMITER_LINE_COLOR_ACTIVE = new Color(194,75, 75);
-    private static final Color SPEED_LIMITER_LINE_COLOR_ACTIVE_NIGHT = new Color(212,30, 30);
+    private static final Color SPEED_LIMITER_LINE_COLOR_ACTIVE = new Color(194, 75, 75);
+    private static final Color SPEED_LIMITER_LINE_COLOR_ACTIVE_NIGHT = new Color(212, 30, 30);
     private static final Color SPEED_LIMITER_LINE_COLOR_INACTIVE = Color.LIGHT_GRAY;
 
     private static final double SPEED_ZERO_ANGLE = Math.toRadians(-112.5f); // Winkel in Grad bei 0 km/h (wird in Radians umgerechnet)
-    private static final float TOTAL_ANGLE = 225; // Spannweite des Winkels in Grad bei höchster Speed, die man anzeigen kann
+    private static final float TOTAL_SPEED_ANGLE = 225; // Spannweite des Winkels in Grad bei höchster Speed, die man anzeigen kann
     private static final int MAX_SPEED = 200; // Höchstgeschwindigkeit, die der Tacho anzeigen kann
-    private static final double ANGLE_PER_KMH = Math.toRadians(TOTAL_ANGLE / MAX_SPEED);
+    private static final double ANGLE_PER_KMH = Math.toRadians(TOTAL_SPEED_ANGLE / MAX_SPEED);
 
-    // ToDo Einstellungsmenü für Addon: Hotkeys (Sirene, Tempomat, Motor an/aus, ...); Farbe des Tempozeigers; ...?
+    private static final double FUEL_ZERO_ANGLE = Math.toRadians(-135.0f); // Winkel in Grad bei 0% Tank (wird in Radians umgerechnet)
+    private static final float TOTAL_FUEL_ANGLE = 90; // Spannweite des Winkels in Grad bei höchstem Füllstand
+    private static final double ANGLE_PER_FUEL_PERCENT = Math.toRadians(TOTAL_FUEL_ANGLE / 100);
+
+    // ToDo Einstellungsmenü für Addon: Hotkeys (Sirene, Tempomat, Motor an/aus, ...); Farbe des Tempozeigers; ...? // EInige Dinge davon natürlich nur auslösen, wenn man Driver ist!
     // ToDo Schön ausführlich kommentieren
 
     private final GermanMinerAddon addon;
@@ -63,7 +67,7 @@ public class VehicleDisplayModule extends Module {
     private boolean nightMode = false;
     private int damageState = -1;
 
-    private int engineFailureLight; // wird hin- und hergesetzt, damit die Lampe blinkt
+    private int engineFailureLight; // wird hochgezählt und resettet, damit die Lampe blinkt
 
     public VehicleDisplayModule(GermanMinerAddon addon) {
         this.addon = addon;
@@ -95,6 +99,7 @@ public class VehicleDisplayModule extends Module {
         drawSpeedLimiterInfo();
         drawEngineAndGearInfo();
         drawWarningLight();
+        drawFuelInfo();
 
     }
 
@@ -103,6 +108,17 @@ public class VehicleDisplayModule extends Module {
         double sin = Math.sin(speedAngle);
         double cos = Math.cos(speedAngle) * -1;
         for (float r = 39; r < 62; r += 0.5) {
+            int pointX = (int) Math.round((centerX + sin * r));
+            int pointY = (int) Math.round((centerY + cos * r));
+            drawUtils.drawRect(pointX, pointY, pointX + 1, pointY + 1, color.getRGB());
+        }
+    }
+
+    private void drawFuelLine(int fuelPercent, Color color) {
+        double fuelAngle = FUEL_ZERO_ANGLE - (fuelPercent * ANGLE_PER_FUEL_PERCENT); // Linie dreht sich andersrum als Tachonadel (also gegen Uhrzeigersinn)
+        double sin = Math.sin(fuelAngle);
+        double cos = Math.cos(fuelAngle) * -1;
+        for (float r = 18; r < 37; r += 0.5) {
             int pointX = (int) Math.round((centerX + sin * r));
             int pointY = (int) Math.round((centerY + cos * r));
             drawUtils.drawRect(pointX, pointY, pointX + 1, pointY + 1, color.getRGB());
@@ -159,6 +175,43 @@ public class VehicleDisplayModule extends Module {
         }
         if (engineFailureLight == 80)
             engineFailureLight = 0;
+    }
+
+    private void drawFuelInfo() {
+        if (fuelPercent == -1)
+            return;
+
+        // ToDO Fuel-Icon
+        drawFuelLine(fuelPercent, Color.WHITE);
+
+
+
+        /*
+        // ToDo Farben anpassen (auch Nachtmodus?)
+        Color unfilledSegmentColor = Color.GRAY;
+        Color filledSegmentColor = Color.GREEN;
+        if (fuelPercent <= 10) {
+            filledSegmentColor = Color.RED;
+        } else if (fuelPercent <= 20) {
+            filledSegmentColor = Color.YELLOW;
+        }
+
+        double valuePerSegment = 20f;
+        int filledSegments = (int) Math.round(fuelPercent / valuePerSegment);
+        StringBuilder sb = new StringBuilder("§" + filledSegmentColor.getChar());
+        for (int i = 0; i < filledSegments; i++) {
+            sb.append(segmentChar);
+        }
+        sb.append("§").append(unfilledSegmentColor.getChar());
+        for (int i = filledSegments; i < segmentAmount; i++) {
+            sb.append(segmentChar);
+        }
+
+        for (int segment = 1; segment <= 5; segment++) { // Anzeige in 5 sich füllenden Segmenten
+
+        }
+         */
+
     }
 
     @Override
