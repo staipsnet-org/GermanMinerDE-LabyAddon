@@ -118,7 +118,7 @@ public class VehicleDisplayModule extends Module {
         double fuelAngle = FUEL_ZERO_ANGLE - (fuelPercent * ANGLE_PER_FUEL_PERCENT); // Linie dreht sich andersrum als Tachonadel (also gegen Uhrzeigersinn)
         double sin = Math.sin(fuelAngle);
         double cos = Math.cos(fuelAngle) * -1;
-        for (float r = 18; r < 37; r += 0.5) {
+        for (float r = 16; r < 36; r += 0.5) {
             int pointX = (int) Math.round((centerX + sin * r));
             int pointY = (int) Math.round((centerY + cos * r));
             drawUtils.drawRect(pointX, pointY, pointX + 1, pointY + 1, color.getRGB());
@@ -181,36 +181,12 @@ public class VehicleDisplayModule extends Module {
         if (fuelPercent == -1)
             return;
 
-        // ToDO Fuel-Icon
-        drawFuelLine(fuelPercent, Color.WHITE);
+        // Hintergrund der Tankanzeige
+        drawUtils.bindTexture(Texture.FUEL_OVERLAY.getResourcePath(nightMode));
+        drawUtils.drawTexture(x, y, 256, 256, 128, 128);
 
-
-
-        /*
-        // ToDo Farben anpassen (auch Nachtmodus?)
-        Color unfilledSegmentColor = Color.GRAY;
-        Color filledSegmentColor = Color.GREEN;
-        if (fuelPercent <= 10) {
-            filledSegmentColor = Color.RED;
-        } else if (fuelPercent <= 20) {
-            filledSegmentColor = Color.YELLOW;
-        }
-
-        double valuePerSegment = 20f;
-        int filledSegments = (int) Math.round(fuelPercent / valuePerSegment);
-        StringBuilder sb = new StringBuilder("§" + filledSegmentColor.getChar());
-        for (int i = 0; i < filledSegments; i++) {
-            sb.append(segmentChar);
-        }
-        sb.append("§").append(unfilledSegmentColor.getChar());
-        for (int i = filledSegments; i < segmentAmount; i++) {
-            sb.append(segmentChar);
-        }
-
-        for (int segment = 1; segment <= 5; segment++) { // Anzeige in 5 sich füllenden Segmenten
-
-        }
-         */
+        // Linie des Füllstandes
+        drawFuelLine(fuelPercent, (nightMode ? SPEEDOMETER_LINE_COLOR_NIGHT : SPEEDOMETER_LINE_COLOR));
 
     }
 
@@ -297,7 +273,7 @@ public class VehicleDisplayModule extends Module {
         WARNING_RED("warning-red.png", null),
         SPEED_LIMITER_ACTIVE("speed-limiter-green.png", null),
         SPEED_LIMITER_READY("speed-limiter-yellow.png", null),
-        FUEL("fuel.png", null);
+        FUEL_OVERLAY("fuel-overlay.png", "fuel-overlay-night.png");
 
         private final String fileName;
         private final String nightFileName;
