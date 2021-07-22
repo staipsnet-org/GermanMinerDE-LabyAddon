@@ -3,7 +3,8 @@ package de.germanminer.addon;
 import com.google.gson.JsonObject;
 import de.germanminer.addon.features.GuiTextboxPrompt;
 import de.germanminer.addon.features.NotificationManager;
-import de.germanminer.addon.features.VehiclePosition;
+import de.germanminer.addon.features.vehicles.VehicleHotkeyListener;
+import de.germanminer.addon.features.vehicles.VehiclePosition;
 import de.germanminer.addon.modules.BankSystemModule;
 import de.germanminer.addon.modules.PlayerLevelModule;
 import de.germanminer.addon.modules.VehicleDisplayModule;
@@ -12,8 +13,8 @@ import net.labymod.api.LabyModAddon;
 import net.labymod.api.events.ServerMessageEvent;
 import net.labymod.ingamegui.ModuleCategory;
 import net.labymod.ingamegui.ModuleCategoryRegistry;
-import net.labymod.settings.elements.ControlElement;
-import net.labymod.settings.elements.SettingsElement;
+import net.labymod.settings.elements.*;
+import net.labymod.utils.Material;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -25,7 +26,7 @@ public class GermanMinerAddon extends LabyModAddon {
     private static GermanMinerAddon instance;
     private static boolean online = false;
 
-    private static final int ABILITIES_VERSION = 1; // ToDo Version immer anpassen
+    private static final int VERSION = 2; // ToDo Version immer anpassen bei Releases + auf Haupt-Repo hinterlegen
 
     private final HashMap<String, Consumer<JsonObject>> serverMessageConsumers = new HashMap<>();
 
@@ -87,21 +88,45 @@ public class GermanMinerAddon extends LabyModAddon {
         GuiTextboxPrompt.initialize();
         NotificationManager.initialize();
         VehiclePosition.initialize();
+        getApi().registerForgeListener(new VehicleHotkeyListener());
         System.out.println("[GermanMinerDE] Finished initialization.");
     }
 
     @Override
     public void loadConfig() {
-        // no config
+        if (getConfig().has("vehicleEngineHotkey"))
+            VehicleHotkeyListener.Function.ENGINE_SWITCH.setHotkey(getConfig().get("vehicleEngineHotkey").getAsInt());
+        if (getConfig().has("vehicleSirenHotkey"))
+            VehicleHotkeyListener.Function.SIREN_SWITCH.setHotkey(getConfig().get("vehicleSirenHotkey").getAsInt());
+
     }
 
     @Override
     protected void fillSettings(List<SettingsElement> list) {
-        // no settings
+        // ** Grundeinstellungen **
+        list.add(new HeaderElement("§cFahrzeug-System"));
+        list.add(new KeyElement("Motor", new ControlElement.IconData(Material.ANVIL), VehicleHotkeyListener.Function.ENGINE_SWITCH.getHotkey(), key -> {
+            if (key < -1)
+                key = -1;
+
+            VehicleHotkeyListener.Function.ENGINE_SWITCH.setHotkey(key);
+
+            getConfig().addProperty("vehicleEngineHotkey", key);
+            saveConfig();
+        }));
+        list.add(new KeyElement("Sirene", new ControlElement.IconData(Material.NOTE_BLOCK), VehicleHotkeyListener.Function.SIREN_SWITCH.getHotkey(), key -> {
+            if (key < -1)
+                key = -1;
+
+            VehicleHotkeyListener.Function.SIREN_SWITCH.setHotkey(key);
+
+            getConfig().addProperty("vehicleSirenHotkey", key);
+            saveConfig();
+        }));
     }
 
-    public static int getAbilitiesVersion() {
-        return ABILITIES_VERSION;
+    public static int getVersion() {
+        return VERSION;
     }
 
 }

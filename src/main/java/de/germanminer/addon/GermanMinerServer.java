@@ -23,7 +23,7 @@ public class GermanMinerServer extends Server {
 
         // -- Version an den Server senden --
         JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("version", GermanMinerAddon.getAbilitiesVersion());
+        jsonObject.addProperty("version", GermanMinerAddon.getVersion());
         LabyMod.getInstance().getLabyModAPI().sendJsonMessageToServer("gmde-addon-info", jsonObject);
     }
 

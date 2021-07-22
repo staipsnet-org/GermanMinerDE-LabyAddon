@@ -1,4 +1,4 @@
-package de.germanminer.addon.features;
+package de.germanminer.addon.features.vehicles;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
