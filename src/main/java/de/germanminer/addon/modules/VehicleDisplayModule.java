@@ -15,8 +15,6 @@ import java.util.Set;
 
 public class VehicleDisplayModule extends Module {
 
-    // ToDo An den Server senden, wenn das Modul aktiviert ist!!! Sonst normale Actionbar nutzen -> ISt gemacht, machmal bekommt man aber ActionBar trotz aktiviertem Tacho-Module (Tacho wird dann nicht showed)
-
     public static final String MESSAGE_KEY = "gmde-vehicle-display";
     private static final String JSON_KEY_SHOW = "show";
     private static final String JSON_KEY_IS_DRIVER = "isDriver";
@@ -45,9 +43,6 @@ public class VehicleDisplayModule extends Module {
     private static final double FUEL_ZERO_ANGLE = Math.toRadians(-135.0f); // Winkel in Grad bei 0% Tank (wird in Radians umgerechnet)
     private static final float TOTAL_FUEL_ANGLE = 90; // Spannweite des Winkels in Grad bei höchstem Füllstand
     private static final double ANGLE_PER_FUEL_PERCENT = Math.toRadians(TOTAL_FUEL_ANGLE / 100);
-
-    // ToDo Einstellungsmenü für Addon: Hotkeys (Sirene, Tempomat, Motor an/aus, ...); Farbe des Tempozeigers; ...? // EInige Dinge davon natürlich nur auslösen, wenn man Driver ist!
-    // ToDo Schön ausführlich kommentieren
 
     private final GermanMinerAddon addon;
     private final DrawUtils drawUtils;
@@ -103,6 +98,11 @@ public class VehicleDisplayModule extends Module {
 
     }
 
+    /**
+     * Geschwindigkeits-Zeiger anzeigen
+     * @param speed Aktuelle km/h
+     * @param color Farbe des Zeigers
+     */
     private void drawSpeedLine(int speed, Color color) {
         double speedAngle = (speed * ANGLE_PER_KMH) + SPEED_ZERO_ANGLE;
         double sin = Math.sin(speedAngle);
@@ -114,6 +114,11 @@ public class VehicleDisplayModule extends Module {
         }
     }
 
+    /**
+     * Tankkfüllstands-Zeiger anzeigen
+     * @param fuelPercent Tankfüllstand in Prozent
+     * @param color Farbe des Zeigers
+     */
     private void drawFuelLine(int fuelPercent, Color color) {
         double fuelAngle = FUEL_ZERO_ANGLE - (fuelPercent * ANGLE_PER_FUEL_PERCENT); // Linie dreht sich andersrum als Tachonadel (also gegen Uhrzeigersinn)
         double sin = Math.sin(fuelAngle);
@@ -125,6 +130,9 @@ public class VehicleDisplayModule extends Module {
         }
     }
 
+    /**
+     * Tachohintergrund mit Geschwindigkeits-Zeiger & digitaler Anzeige anzeigen
+     */
     private void drawSpeedometer() {
         // Hintergrund des Tachos
         drawUtils.bindTexture(Texture.SPEEDOMETER_BACKGROUND_BLACK.getResourcePath(nightMode));
@@ -137,6 +145,9 @@ public class VehicleDisplayModule extends Module {
         drawUtils.drawCenteredString(String.valueOf(speed), centerX, centerY - 12, 2);
     }
 
+    /**
+     * Infos zum Motor & Getriebe anzeigen
+     */
     private void drawEngineAndGearInfo() {
         String info = null;
         if ("STARTING".equals(engineState))
@@ -150,8 +161,11 @@ public class VehicleDisplayModule extends Module {
             drawUtils.drawCenteredString(info, centerX, centerY - 20, 0.5d);
     }
 
+    /**
+     * Infos zum Tempolimiter anzeigen
+     */
     private void drawSpeedLimiterInfo() {
-        if (limiterSpeed < 30)
+        if (limiterSpeed < 10)
             return;
 
         Texture limiterTexture = limiterActive ? Texture.SPEED_LIMITER_ACTIVE : Texture.SPEED_LIMITER_READY;
@@ -162,6 +176,9 @@ public class VehicleDisplayModule extends Module {
         drawSpeedLine(limiterSpeed, limiterActive ? (nightMode ? SPEED_LIMITER_LINE_COLOR_ACTIVE_NIGHT : SPEED_LIMITER_LINE_COLOR_ACTIVE) : SPEED_LIMITER_LINE_COLOR_INACTIVE);
     }
 
+    /**
+     * Warnleuchte anzeigen (bei starker Beschädigung)
+     */
     private void drawWarningLight() {
         if (damageState < 1)
             return;
@@ -177,6 +194,9 @@ public class VehicleDisplayModule extends Module {
             engineFailureLight = 0;
     }
 
+    /**
+     * Tankanzeigen-Overlay und Zeiger anzeigen
+     */
     private void drawFuelInfo() {
         if (fuelPercent == -1)
             return;
@@ -224,7 +244,7 @@ public class VehicleDisplayModule extends Module {
 
     @Override
     public boolean isShown() {
-        return GermanMinerAddon.isOnline() && show && addon.getApi().isIngame(); // ToDo Einstellung, ob es angezeigt wird, wenn man Chat offen hat -> hasGameFocus()
+        return GermanMinerAddon.isOnline() && show && addon.getApi().isIngame();
     }
 
     @Override
@@ -267,7 +287,10 @@ public class VehicleDisplayModule extends Module {
         return 0;
     }
 
-    private enum Texture {
+    /**
+     * Texturen für den Tacho und darin befindliche Anzeigen
+     */
+    public enum Texture {
         SPEEDOMETER_BACKGROUND_BLACK("speedometer-background-black.png", "speedometer-background-black-night.png"),
         WARNING_YELLOW("warning-yellow.png", null),
         WARNING_RED("warning-red.png", null),
@@ -283,7 +306,7 @@ public class VehicleDisplayModule extends Module {
             this.nightFileName = nightFileName;
         }
 
-        protected String getResourcePath(boolean night) {
+        public String getResourcePath(boolean night) {
             return TEXTURE_BASE_PATH + (night && nightFileName != null ? nightFileName : fileName);
         }
     }

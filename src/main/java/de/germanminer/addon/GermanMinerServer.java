@@ -25,6 +25,9 @@ public class GermanMinerServer extends Server {
         JsonObject jsonObject = new JsonObject();
         jsonObject.addProperty("version", GermanMinerAddon.getVersion());
         LabyMod.getInstance().getLabyModAPI().sendJsonMessageToServer("gmde-addon-info", jsonObject);
+
+        // -- Info zum VehicleDisplayModule an den Server senden --
+        GermanMinerAddon.getVehicleDisplayModule().sendModuleInfo();
     }
 
     @Override

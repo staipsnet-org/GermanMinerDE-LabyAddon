@@ -8,6 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityTracker;
 
+/**
+ * Der Client erhält vom Server Infos zu Vehicles & Sitzen in der Nähe, um deren Positionen 100% exakt zeitgleich darzustellen
+ * (das klappt von Minecraft aus sonst nicht so reibungslos, da der Server die Positions-Updates in einzelne Netzwerk-Pakete packt und es dadurch verzögert wird)
+ */
 public final class VehiclePosition {
 
     public static final String ENTITIES_ARRAY_NAME = "entities";
@@ -33,7 +37,7 @@ public final class VehiclePosition {
                         double z = ((JsonObject) entityData).get("z").getAsDouble();
                         float yaw = ((JsonObject) entityData).get("yaw").getAsFloat();
                         float pitch = ((JsonObject) entityData).get("pitch").getAsFloat();
-                        EntityTracker.updateServerPosition(entity, x,y, z);
+                        EntityTracker.updateServerPosition(entity, x, y, z);
                         entity.setPositionAndRotationDirect(x, y, z, yaw, pitch, 3, false);
                     }
                 }

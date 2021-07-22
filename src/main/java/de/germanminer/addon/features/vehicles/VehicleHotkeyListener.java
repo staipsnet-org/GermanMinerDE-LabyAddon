@@ -2,14 +2,9 @@ package de.germanminer.addon.features.vehicles;
 
 import com.google.gson.JsonObject;
 import de.germanminer.addon.GermanMinerAddon;
-import de.germanminer.addon.GermanMinerServer;
-import net.labymod.ingamegui.enums.EnumDisplayType;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.input.Keyboard;
-
-import java.util.UUID;
 
 public class VehicleHotkeyListener {
 
@@ -31,16 +26,19 @@ public class VehicleHotkeyListener {
 
     public enum Function {
         ENGINE_SWITCH(50), // 50 = M
-        SIREN_SWITCH(35); // 35 = H
-        // ToDo Tempomat +/-
+        SIREN_SWITCH(35), // 35 = H
+        SPEEDLIMITER_SWITCH,
+        SPEEDLIMITER_SET;
 
         Function(int defaultHotkey) {
-            this.defaultHotkey = defaultHotkey;
             this.hotkey = defaultHotkey;
         }
 
+        Function() {
+            this(-1);
+        }
+
         private long lastAction;
-        private final int defaultHotkey;
         private int hotkey;
 
         public int getHotkey() {
@@ -49,10 +47,6 @@ public class VehicleHotkeyListener {
 
         public void setHotkey(int hotkey) {
             this.hotkey = hotkey;
-        }
-
-        public int getDefaultHotkey() {
-            return defaultHotkey;
         }
 
         public void execute() {
