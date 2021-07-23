@@ -244,7 +244,7 @@ public class VehicleDisplayModule extends Module {
 
     @Override
     public boolean isShown() {
-        return GermanMinerAddon.isOnline() && show && addon.getApi().isIngame();
+        return GermanMinerAddon.isOnline() && show && addon.getApi().isIngame() && addon.getApi().hasGameFocus();
     }
 
     @Override
