@@ -254,17 +254,26 @@ public class VehicleDisplayModule extends Module {
 
     @Override
     public double getHeight() {
-        return getWidth();
+        return scaleModuleSize(this.getRawSize(), false);
     }
 
     @Override
     public double getWidth() {
+        return getHeight();
+    }
+
+    public double getRawSize() {
         return 128D;
     }
 
     @Override
     public void loadSettings() {
         // Keine Einstellungen nötig
+    }
+
+    @Override
+    protected boolean supportsRescale() {
+        return true;
     }
 
     @Override
