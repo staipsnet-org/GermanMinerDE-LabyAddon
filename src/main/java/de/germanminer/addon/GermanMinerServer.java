@@ -1,6 +1,8 @@
 package de.germanminer.addon;
 
+import com.google.gson.JsonObject;
 import net.labymod.api.events.TabListEvent;
+import net.labymod.main.LabyMod;
 import net.labymod.servermanager.ChatDisplayAction;
 import net.labymod.servermanager.Server;
 import net.labymod.settings.elements.SettingsElement;
@@ -12,12 +14,20 @@ import java.util.List;
 public class GermanMinerServer extends Server {
 
     public GermanMinerServer() {
-        super("germanminer_de", "mc.germanminer.de", "germanminer.de", "51.89.43.54:25565", "51.38.101.164:26511", "51.38.101.164:26512");
+        super("germanminer_de", "mc.germanminer.de", "germanminer.de", "testserver.germanminer.de", "bauserver.germanminer.de", "51.77.73.236:25565", "51.89.46.236:26510", "51.89.46.236:26511", "51.89.46.236:26512");
     }
 
     @Override
     public void onJoin(ServerData serverData) {
         GermanMinerAddon.setOnline(true);
+
+        // -- Version an den Server senden --
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty("version", GermanMinerAddon.getVersion());
+        LabyMod.getInstance().getLabyModAPI().sendJsonMessageToServer("gmde-addon-info", jsonObject);
+
+        // -- Info zum VehicleDisplayModule an den Server senden --
+        GermanMinerAddon.getVehicleDisplayModule().sendModuleInfo();
     }
 
     @Override
