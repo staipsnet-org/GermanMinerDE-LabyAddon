@@ -3,7 +3,7 @@
   "name": "GermanMinerDE",
   "mainClass": "de.germanminer.addon.GermanMinerAddon",
   "description": "Offizielles Addon zur Verbesserung von diversen Spielbereichen auf dem Real-Life-Server GermanMinerDE",
-  "version": 2,
+  "version": 4,
   "author": "GermanMinerDE / Duetro & SchmidtMax",
   "category": 3,
   "icon": "http://img.germanminer.de/server-icon.png"
