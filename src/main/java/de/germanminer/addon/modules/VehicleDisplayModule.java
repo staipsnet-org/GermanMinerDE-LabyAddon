@@ -17,12 +17,12 @@ public class VehicleDisplayModule extends Module {
 
     public static final String MESSAGE_KEY = "gmde-vehicle-display";
     private static final String JSON_KEY_SHOW = "show";
-    private static final String JSON_KEY_IS_DRIVER = "isDriver";
     private static final String JSON_KEY_SPEED = "speed";
     private static final String JSON_KEY_LIMITER_ACTIVE = "limiterActive";
     private static final String JSON_KEY_LIMITER_SPEED = "limiterSpeed";
     private static final String JSON_KEY_FUEL = "fuelPercent";
     private static final String JSON_KEY_GEAR_POSITION = "gearPosition";
+    private static final String JSON_KEY_FLIGHT_HEIGHT = "flightHeight";
     private static final String JSON_KEY_ENGINE_STATE = "engineState";
     private static final String JSON_KEY_NIGHT_MODE = "nightMode";
     private static final String JSON_KEY_DAMAGE_STATE = "damageState";
@@ -52,12 +52,12 @@ public class VehicleDisplayModule extends Module {
     private double centerY;
 
     private boolean show = false;
-    private boolean isDriver = false;
     private int speed = -1;
     private boolean limiterActive = false;
     private int limiterSpeed = -1;
     private int fuelPercent = -1;
     private String gearPosition = null;
+    private int flightHeight = -1;
     private String engineState = null;
     private boolean nightMode = false;
     private int damageState = -1;
@@ -71,12 +71,12 @@ public class VehicleDisplayModule extends Module {
             show = jsonObject.has(JSON_KEY_SHOW) && jsonObject.get(JSON_KEY_SHOW).isJsonPrimitive() && jsonObject.get(JSON_KEY_SHOW).getAsBoolean();
             if (!show)
                 return;
-            isDriver = jsonObject.has(JSON_KEY_IS_DRIVER) && jsonObject.get(JSON_KEY_IS_DRIVER).isJsonPrimitive() && jsonObject.get(JSON_KEY_IS_DRIVER).getAsBoolean();
             speed = (jsonObject.has(JSON_KEY_SPEED) && jsonObject.get(JSON_KEY_SPEED).isJsonPrimitive()) ? Math.min(jsonObject.get(JSON_KEY_SPEED).getAsInt(), MAX_SPEED) : -1;
             limiterActive = jsonObject.has(JSON_KEY_LIMITER_ACTIVE) && jsonObject.get(JSON_KEY_LIMITER_ACTIVE).isJsonPrimitive() && jsonObject.get(JSON_KEY_LIMITER_ACTIVE).getAsBoolean();
             limiterSpeed = (jsonObject.has(JSON_KEY_LIMITER_SPEED) && jsonObject.get(JSON_KEY_LIMITER_SPEED).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_LIMITER_SPEED).getAsInt() : -1;
             fuelPercent = (jsonObject.has(JSON_KEY_FUEL) && jsonObject.get(JSON_KEY_FUEL).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_FUEL).getAsInt() : -1;
             gearPosition = (jsonObject.has(JSON_KEY_GEAR_POSITION) && jsonObject.get(JSON_KEY_GEAR_POSITION).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_GEAR_POSITION).getAsString() : null;
+            flightHeight = (jsonObject.has(JSON_KEY_FLIGHT_HEIGHT) && jsonObject.get(JSON_KEY_FLIGHT_HEIGHT).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_FLIGHT_HEIGHT).getAsInt() : -1;
             engineState = (jsonObject.has(JSON_KEY_ENGINE_STATE) && jsonObject.get(JSON_KEY_ENGINE_STATE).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_ENGINE_STATE).getAsString() : null;
             damageState = (jsonObject.has(JSON_KEY_DAMAGE_STATE) && jsonObject.get(JSON_KEY_DAMAGE_STATE).isJsonPrimitive()) ? jsonObject.get(JSON_KEY_DAMAGE_STATE).getAsInt() : -1;
             nightMode = jsonObject.has(JSON_KEY_NIGHT_MODE) && jsonObject.get(JSON_KEY_NIGHT_MODE).isJsonPrimitive() && jsonObject.get(JSON_KEY_NIGHT_MODE).getAsBoolean();
@@ -156,6 +156,8 @@ public class VehicleDisplayModule extends Module {
             info = "Motor aus";
         else if (gearPosition != null)
             info = "Gang: " + gearPosition.charAt(0);
+        else if (flightHeight != -1)
+            info = "Höhe: " + flightHeight + " ft";
 
         if (info != null)
             drawUtils.drawCenteredString(info, centerX, centerY - 20, 0.5d);
